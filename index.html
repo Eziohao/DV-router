@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Router</title>
+   <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+   
+</head>
+<body> 
+  <h1>Welcome to Router control</h1>
+  <h2>Commands</h2>
+  <p>Add</p>
+  <p>Change</p>
+  <p>Display</p>
+  <p>Kill</p>
+ 
+
+
+  <ul id="messages"></ul>
+    <form id='fom'action="">
+      <input id="m" autocomplete="off" /><button>Send</button>
+    </form>
+    <script src='/socket.io/socket.io.js'></script>  
+    <script src='http://code.jquery.com/jquery-2.1.1.min.js'></script> 
+    <script >
+    var socket = io();  //expose the io() api
+    window.flag = 0;  //to control all things
+    $('#fom').submit(function() {  //when the submit event happen 
+      if(window.flag==0){
+        if($('#m').val()=='add'){
+          socket.emit('add',$('#m').val());
+          $('#m').val('');
+          return false;
+        }
+      }
+      if(window.flag==1){
+        console.log('routers');
+        socket.emit('routers',$('#m').val());
+        $('#m').val('');
+        return false;
+      }
+      if(window.flag==2){
+        console.log('port');
+        socket.emit('port',$('#m').val());
+        $('#m').val('');
+        
+        return false;
+      }
+      if(window.flag==3){
+        console.log('cost');
+        socket.emit('cost',$('#m').val());
+        $('#m').val('');
+        window.flag=0;
+        return false;
+      }
+      });
+      socket.on('add_what',function(msg){
+           $('#messages').append($('<li>').text(msg));
+            window.flag = 1;
+      });
+      socket.on('add_port',function(msg){
+        $('#messages').append($('<li>').text(msg));
+        window.flag=2;
+      });
+       socket.on('add_cost',function(msg){
+        $('#messages').append($('<li>').text(msg));
+        window.flag=3;
+      });
+      socket.on('message',function(msg){
+        $('#messages').append($('<li>').text(msg));
+        window.flag=0;
+
+      })
+</script>
+</body>
+</html> 

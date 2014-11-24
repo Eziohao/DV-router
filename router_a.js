@@ -77,6 +77,7 @@ io.on('connection', function(socket) { //if a user coonect the server
         console.log(router[name][port]);
         io.emit('message',msg);
 	})
+	
 });
 
 

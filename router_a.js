@@ -1,7 +1,7 @@
 var app = require('express')(); //get express model
 var http = require('http').Server(app); //create a http server
 var io = require('socket.io')(http); //create socket.io
-var user_name = 'no user'; //to store login user_name
+var router_name = 'A'; //to store login user_name
 var DV = '{"sID":A,"dID":B,"des":0,"nh":0,"NID":0}';
 var router=new Array;
 var name;
@@ -31,6 +31,11 @@ io.on('connection', function(socket) { //if a user coonect the server
 		msg = 'which router cost you want to add ?'
 		io.emit('add_what', msg);
 	});
+	socket.on('change',function(msg){
+          console.log('change');
+          msg = 'which router cost you want to change ?';
+          io.emit('change_what',msg);
+	});
 	socket.on('routers', function(msg) {
 		console.log('chose router');
 		if (!findrouters(msg)) {
@@ -46,10 +51,21 @@ io.on('connection', function(socket) { //if a user coonect the server
 		}
 
 	});
+	socket.on('kill',function(msg){
+         var msg='router'+' '+router_name+' '+"is killed";
+         io.emit('message',msg);
+         process.exit(0);
+	});
+	socket.on('change_routers',function(msg){
+		name=msg;
+		console.log('change routers');
+		var msg='Ok,  port number ?';
+		io.emit('add_port',msg);
+
+	})
 	socket.on('port', function(msg) {
 		console.log('add port');
 		port=msg;
-		router[name][msg]=new Array;
 		var msg="How many cost ?"
 		io.emit('add_cost', msg);
 

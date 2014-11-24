@@ -41,6 +41,17 @@
           $('#m').val('');
           return false;
         }
+        if($('#m').val()=='change'){
+          socket.emit('change',$('#m').val());
+          $('#m').val('');
+           return false;
+
+        }
+        if($('#m').val()=='kill'){
+          socket.emit('kill',$('#m').val());
+          $('#m').val('');
+          return false;
+        }
       }
       if(window.flag==1){
         console.log('routers');
@@ -62,6 +73,13 @@
         window.flag=0;
         return false;
       }
+      if(window.flag==4){
+        console.log('change_routers');
+        socket.emit('change_routers',$('#m').val());
+        $('#m').val('');
+        return false; 
+      }
+
       });
       socket.on('add_what',function(msg){
            $('#messages').append($('<li>').text(msg));
@@ -77,9 +95,14 @@
       });
       socket.on('message',function(msg){
         $('#messages').append($('<li>').text(msg));
-        window.flag=0;
+        
 
-      })
+      });
+      socket.on('change_what',function(msg){
+        $('#messages').append($('<li>').text(msg));
+        window.flag=4;
+      });
+      
 </script>
 </body>
 </html> 

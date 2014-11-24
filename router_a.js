@@ -74,7 +74,7 @@ io.on('connection', function(socket) { //if a user coonect the server
         console.log('add cost');
         router[name][port]=msg;
         
-        DV={name:{"sID":'a',"dID":name,"dP":port,"nH":1,"dis":msg,"nR":name}};
+        DV[name]={"sID":'a',"dID":name,"dP":port,"nH":1,"dis":msg,"nR":name};
        /* DV.name.sID='a';
         DV.name.dID=name;
         DV.name.dP=port;

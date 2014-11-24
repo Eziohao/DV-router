@@ -1,8 +1,8 @@
 var app = require('express')(); //get express model
 var http = require('http').Server(app); //create a http server
 var io = require('socket.io')(http); //create socket.io
-var router_name = 'A'; //to store login user_name
-var DV = '{"sID":A,"dID":B,"des":0,"nh":0,"NID":0}';
+var router_name = 'A'; //to store login router_name
+var DV = {};
 var router=new Array;
 var name;
 var port;
@@ -73,8 +73,17 @@ io.on('connection', function(socket) { //if a user coonect the server
 	socket.on('cost',function(msg){
         console.log('add cost');
         router[name][port]=msg;
+        
+        DV={name:{"sID":'a',"dID":name,"dP":port,"nH":1,"dis":msg,"nR":name}};
+       /* DV.name.sID='a';
+        DV.name.dID=name;
+        DV.name.dP=port;
+        DV.name.nH=1;
+        DV.name.dis=msg;
+        DV.name.nR=name;*/
         var msg=name+" "+"is set";
         console.log(router[name][port]);
+        console.log(DV);
         io.emit('message',msg);
 	})
 	

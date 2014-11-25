@@ -1,9 +1,9 @@
 var app = require('express')(); //get express model
 var http = require('http').Server(app); //create a http server
 var io = require('socket.io')(http); //create socket.io
-var router_name = 'b'; //to store login router_name
+var router_name = 'c'; //to store login router_name
 var DV = {};
-var b_DV={'d':{"sID": router_name,
+var c_DV={'d':{"sID": router_name,
 			"dID": 'd',
 			"dP": '5834',
 			"nH": 1,
@@ -98,7 +98,7 @@ io.on('connection', function(socket) { //if a user coonect the server
 	
 });
 
-var s=JSON.stringify(b_DV);
+var s=JSON.stringify(c_DV);
 console.log(s);
 var copy=new Buffer(s);
 
@@ -111,7 +111,7 @@ client.send(copy,0,copy.length,a_port,'127.0.0.1',function(err,bytes){
 	client.close();
 })
 
-http.listen(8082, function() { //The router will listen commands from port 2547
+http.listen(8083, function() { //The router will listen commands from port 2547
 	console.log('Routers starts on 8082');
 
 

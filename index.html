@@ -96,7 +96,7 @@
       socket.on('message',function(msg){
         $('#messages').append($('<li>').text(msg));
         
-
+         window.flag=0;
       });
       socket.on('change_what',function(msg){
         $('#messages').append($('<li>').text(msg));

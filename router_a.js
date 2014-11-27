@@ -3,93 +3,45 @@ var http = require('http').Server(app); //create a http server
 var io = require('socket.io')(http); //create socket.io
 
 var router_name = 'a'; //to store login router_name
-var router_port=2547;
-var b_port=3721;
-var c_port=4568;
+var router_port = 2547;
+var b_port = 3721;
+var c_port = 4568;
 var DV = {};
-var temp={};
+var temp = {};
+
 var router = new Array;
 var name;
 var port;
 var dgram = require('dgram'); // UDP需要引入该模块
 var server = dgram.createSocket('udp4'); // ipv4
-var server1=dgram.createSocket('udp4');
+var server1 = dgram.createSocket('udp4');
 
 app.get('/', function(req, res) { //link the js to html file
 	res.sendfile('index.html');
 
 });
 
-function routing(b_DV, c_DV) {
-	var temp = {};
-	var temp1 = {};
-	var s_DV={};
-	for (var item in DV) {
-		for (var i in b_DV) {
-			if (item == b_DV[i].sID) {
-				console.log('find');
-				temp[i] = {
-
-					"sID": b_DV[i].sID,
-					"dID": b_DV[i].dID,
-					"dP": b_DV[i].dP,
-					"nH": b_DV[i].nH,
-					"dis": b_DV[i].dis,
-					"nR": b_DV[i].nR
-
-				};
-
-			}
-		}
-	}
-	for (var item in DV) {
-		for (var i in c_DV) {
-			if (item == c_DV[i].sID) {
-				console.log('got');
-				temp1[i] = {
-
-					"sID": c_DV[i].sID,
-					"dID": c_DV[i].dID,
-					"dP": c_DV[i].dP,
-					"nH": c_DV[i].nH,
-					"dis": c_DV[i].dis,
-					"nR": c_DV[i].nR
-
-				};
-			}
-		}
-	}
-	for (var item in temp) {
-		for (var i in temp1) {
-			if (item == i) {
-				console.log('haha');
-				if (temp[item].dis + DV[temp[item].sID].dis >= DV[temp1[i].sID].dis + temp1[i].dis) {
-					s_DV[i] = {
+function routing(s_DV) {
+	if (DV != {}) {
+		for (var item in s_DV) {
+			for (var i in DV) {
+				if (item != i && item != router_name && DV[item] == {}) {
+					DV[item] = {
 						"sID": router_name,
-						"dID": temp1[i].dID,
-						"dP": temp1[i].dP,
-						"nH": temp1[i].nH + 1,
-						"dis": temp1[i].dis + DV[temp1[i].sID].dis,
-						"nR": i
+						"dID": s_DV[item].dID,
+						"dP": s_DV[item].dP,
+						"nH": s_DV[item].nH + DV[s_DV[item].sID].nH,
+						"dis": s_DV[item].dis + DV[s_DV.sID].dis,
+						"nR": s_DV[item].sID
+					};
+				} else if (item != i && item != router_name && DV[item] != {}) {
+					if (DV[item].nR != s_DV[item].sID) {
+                          
 					}
-					console.log(s_DV);
-				}
-				else{
-				   	s_DV[i] = {
-						"sID": router_name,
-						"dID": temp[item].dID,
-						"dP": temp[item].dP,
-						"nH": temp[item].nH + 1,
-						"dis": temp[item].dis + DV[temp[item].sID].dis,
-						"nR": temp[item].sID
-					}
-					console.log(s_DV);
-
 				}
 			}
 		}
 	}
-    return s_DV;
 };
 
 
@@ -119,7 +71,7 @@ io.on('connection', function(socket) { //if a user coonect the server
 		if (!findrouters(msg)) {
 			name = msg;
 			router[msg] = new Array;
-			console.log(router);
+
 			var msg = 'Ok, port number?';
 			io.emit('add_port', msg);
 		} else {
@@ -159,39 +111,29 @@ io.on('connection', function(socket) { //if a user coonect the server
 			"dis": msg,
 			"nR": name
 		};
-	
+
 		var msg = name + " " + "is set";
 		console.log(router[name][port]);
 		console.log(DV);
-	
+
 		io.emit('message', msg);
 	});
 
 
 });
-server.on('listening',function(){
+server.on('listening', function() {
 	console.log('udp started');
 });
-server.on('message',function(message){
-    var s_DV = {};
-    s_DV=JSON.parse(message);
-    
-    for(var item in temp){
-      for(var i in s_DV){
-      	if(item!=i){
-          temp[item]=s_DV[i];
-      	}
-      	else{
-            temp=routing(temp,s_DV);
-      	}
-      }
-    }
-    console.log(temp);
+server.on('message', function(message) {
+	var s_DV = {};
+	s_DV = JSON.parse(message);
+
+	console.log(temp);
 })
 
 
 
-server.bind(2547,'127.0.0.1');
+server.bind(2547, '127.0.0.1');
 
 
 http.listen(8081, function() { //The router will listen commands from port 8081

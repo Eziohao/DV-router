@@ -2,13 +2,24 @@ var app = require('express')(); //get express model
 var http = require('http').Server(app); //create a http server
 var io = require('socket.io')(http); //create socket.io
 var router_name = 'c'; //to store login router_name
+var router_port=4568;
 var DV = {};
 var c_DV={'d':{"sID": router_name,
 			"dID": 'd',
 			"dP": '5834',
 			"nH": 1,
 			"dis": 3,
-			"nR": 'd'}};
+			"nR": 'd',
+		    "sP":router_port},
+		   'a':{
+		   	"sID": router_name,
+			"dID": 'a',
+			"dP": '2547',
+			"nH": 1,
+			"dis": 2,
+			"nR": 'a',
+		    "sP":router_port
+		   }};
 var a_port=2547;
 var router=new Array;
 var name;
@@ -31,6 +42,14 @@ function findrouters(name){
 			return false;
 		}
 	}
+}
+function isEmpty(obj) {
+	for (var prop in obj) {
+		if (obj.hasOwnProperty(prop))
+			return false;
+	}
+
+	return true;
 }
 io.on('connection', function(socket) { //if a user coonect the server
 	console.log('connect to the control');
@@ -97,22 +116,39 @@ io.on('connection', function(socket) { //if a user coonect the server
 	
 	
 });
-
+function send(){
 var s=JSON.stringify(c_DV);
-console.log(s);
+//console.log(s);
 var copy=new Buffer(s);
 
 var s1=JSON.parse(s);
-console.log(s1);
+//console.log(s1);
 client.send(copy,0,copy.length,a_port,'127.0.0.1',function(err,bytes){
 	if(err){
 		throw err;
 	}
 	client.close();
 })
+}
+//setInterval(send(),5000);
+server.bind(router_port, '127.0.0.1');
+setInterval(function () {
+    if (!isEmpty(c_DV)) {
+		s = JSON.stringify(c_DV);
+		var copy = new Buffer(s);
+		
+			client.send(copy, 0, copy.length, a_port, '127.0.0.1', function(err, bytes) {
+				if (err) {
+					throw err;
+				}
+				
+			})
+		
+	}
+}, 5000);
 
 http.listen(8083, function() { //The router will listen commands from port 2547
-	console.log('Routers starts on 8082');
+	console.log('Routers starts on 8083');
 
 
 });

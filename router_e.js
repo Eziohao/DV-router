@@ -2,8 +2,8 @@ var app = require('express')(); //get express model
 var http = require('http').Server(app); //create a http server
 var io = require('socket.io')(http); //create socket.io
 
-var router_name = 'a'; //to store login router_name
-var router_port = 2547;
+var router_name = 'e'; //to store login router_name
+var router_port = 8710;
 var DV = {};
 
 var router = new Array;
@@ -18,11 +18,11 @@ app.get('/', function(req, res) { //link the js to html file
 
 });
 //console.log(isEmpty(DV['d']));
-function routing(s_DV) {                   //routing 
+function routing(s_DV) {
 	if (!isEmpty(DV)) {
 		for (var item in s_DV) {
 			for (var i in DV) {
-				if (item != i && item != router_name && isEmpty(DV[item])&&!isEmpty(DV[s_DV[item].sID])) {
+				if (item != i && item != router_name && isEmpty(DV[item])&&!isEmpty(DV[s_DV[item].sID])){
 					console.log('get it');
 					DV[item] = {
 						"sID": router_name,
@@ -87,7 +87,6 @@ function routing(s_DV) {                   //routing
     }
 
 };
-
 
 
 function findrouters(name) {
@@ -195,9 +194,9 @@ io.on('connection', function(socket) { //if a user coonect the server
     	msg=JSON.stringify(DV);
     	io.emit('display on',msg);
     })
-   console.log(temp);
-   console.log('change');
-   console.log(temp1);
+    console.log(temp);
+    console.log('change');
+    console.log(temp1);
 });
 server.on('listening', function() {
 	console.log('udp started');
@@ -230,6 +229,6 @@ setInterval(function () {
 server.bind(router_port, '127.0.0.1');
 
 
-http.listen(8081, function() { //The router will listen commands from port 8081
-	console.log('Routers starts on 8081');
+http.listen(8085, function() { //The router will listen commands from port 8081
+	console.log('Routers starts on 8085');
 });

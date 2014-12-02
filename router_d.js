@@ -2,9 +2,10 @@ var app = require('express')(); //get express model
 var http = require('http').Server(app); //create a http server
 var io = require('socket.io')(http); //create socket.io
 
-var router_name = 'a'; //to store login router_name
-var router_port = 2547;
+var router_name = 'd'; //to store login router_name
+var router_port = 5834;
 var DV = {};
+
 
 var router = new Array;
 var name;
@@ -18,7 +19,7 @@ app.get('/', function(req, res) { //link the js to html file
 
 });
 //console.log(isEmpty(DV['d']));
-function routing(s_DV) {                   //routing 
+function routing(s_DV) {
 	if (!isEmpty(DV)) {
 		for (var item in s_DV) {
 			for (var i in DV) {
@@ -110,19 +111,19 @@ function isEmpty(obj) {
 }
 
 function send() {
-		if (!isEmpty(DV)) {
-			s = JSON.stringify(DV);
-			var copy = new Buffer(s);
-			for (item in DV) {
-				client.send(copy, 0, copy.length, DV[item].dP, '127.0.0.1', function(err, bytes) {
-					if (err) {
-						throw err;
-					}
-					client.close();
-				})
-			}
+	if (!isEmpty(DV)) {
+		s = JSON.stringify(DV);
+		var copy = new Buffer(s);
+		for (item in DV) {
+			client.send(copy, 0, copy.length, DV[item].dP, '127.0.0.1', function(err, bytes) {
+				if (err) {
+					throw err;
+				}
+				client.close();
+			})
 		}
 	}
+}
 
 
 io.on('connection', function(socket) { //if a user coonect the server
@@ -181,7 +182,7 @@ io.on('connection', function(socket) { //if a user coonect the server
 			"nH": 1,
 			"dis": msg,
 			"nR": name,
-			"sP":router_port
+			"sP": router_port
 		};
 
 		var msg = name + " " + "is set";
@@ -190,14 +191,14 @@ io.on('connection', function(socket) { //if a user coonect the server
 
 		io.emit('message', msg);
 	});
-    socket.on('display',function(msg){
-    	console.log('display');
-    	msg=JSON.stringify(DV);
-    	io.emit('display on',msg);
-    })
-   console.log(temp);
-   console.log('change');
-   console.log(temp1);
+	socket.on('display', function(msg) {
+		console.log('display');
+		msg = JSON.stringify(DV);
+		io.emit('display on', msg);
+	})
+console.log(temp);
+console.log('change');
+console.log(temp1);
 });
 server.on('listening', function() {
 	console.log('udp started');
@@ -205,21 +206,21 @@ server.on('listening', function() {
 server.on('message', function(message, rinfo) {
 	var s_DV = {};
 	s_DV = JSON.parse(message);
-	
-		routing(s_DV);
-		console.log(DV);
-	
+
+	routing(s_DV);
+	console.log(DV);
+
 })
-setInterval(function () {
-    if (!isEmpty(DV)) {
+setInterval(function() {
+	if (!isEmpty(DV)) {
 		s = JSON.stringify(DV);
 		var copy = new Buffer(s);
-		for(item in DV){
+		for (item in DV) {
 			client.send(copy, 0, copy.length, DV[item].dP, '127.0.0.1', function(err, bytes) {
 				if (err) {
 					throw err;
 				}
-				
+
 			})
 		}
 	}
@@ -230,6 +231,6 @@ setInterval(function () {
 server.bind(router_port, '127.0.0.1');
 
 
-http.listen(8081, function() { //The router will listen commands from port 8081
-	console.log('Routers starts on 8081');
+http.listen(8084, function() { //The router will listen commands from port 8081
+	console.log('Routers starts on 8084');
 });

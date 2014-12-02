@@ -52,6 +52,11 @@
           $('#m').val('');
           return false;
         }
+        if($('#m').val()=='display'){
+          socket.emit('display',$('#m').val());
+          $('#m').val('');
+          return false;
+        }
       }
       if(window.flag==1){
         console.log('routers');
@@ -102,6 +107,10 @@
         $('#messages').append($('<li>').text(msg));
         window.flag=4;
       });
+      socket.on('display on',function(msg){
+        $('#messages').append($('<li>').text(msg));
+      
+      })
       
 </script>
 </body>

@@ -6,7 +6,6 @@ var router_name = 'b'; //to store login router_name
 var router_port = 3721;
 var DV = {};
 
-
 var router = new Array;
 var name;
 var port;
@@ -23,20 +22,20 @@ function routing(s_DV) {
 	if (!isEmpty(DV)) {
 		for (var item in s_DV) {
 			for (var i in DV) {
-				if (item != i && item != router_name && isEmpty(DV[item])) {
+				if (item != i && item != router_name && isEmpty(DV[item])&&!isEmpty(DV[s_DV[item].sID])){
 					console.log('get it');
 					DV[item] = {
 						"sID": router_name,
 						"dID": s_DV[item].dID,
 						"dP": s_DV[item].dP,
-						"nH": parseInt(s_DV[item].nH) +parseInt(DV[s_DV[item].sID].nH),
-						"dis": parseInt(s_DV[item].dis) + parseInt(DV[s_DV[item].sID].dis),
+						"nH": parseInt(s_DV[item].nH)+parseInt(DV[s_DV[item].sID].nH),
+						"dis": parseInt(s_DV[item].dis)+parseInt(DV[s_DV[item].sID].nH) ,
 						"nR": s_DV[item].sID,
 						"sP":router_port
 					};
 				} else if (item != i && item != router_name && !isEmpty(DV[item])) {
 					console.log('have it');
-					if (DV[item].nR != s_DV[item].sID) {
+					if (DV[item].nR != s_DV[item].sID&&!isEmpty(DV[s_DV[item].sID])) {
 						if (parseInt(DV[item].dis) >= parseInt(s_DV[item].dis) + parseInt(DV[s_DV[item].sID].dis)) {
 							console.log('change cost');
 							DV[item].dis = parseInt(s_DV[item].sID) + parseInt(DV[s_DV[item].sID].dis);
@@ -44,6 +43,18 @@ function routing(s_DV) {
 							DV[item].nR = s_DV[item].sID;
 						}
 					}
+				}
+				else if(item==router_name&&isEmpty(DV[s_DV[item].sID])){
+					console.log('catch it');
+					DV[s_DV[item].sID]={
+    				    "sID": router_name,
+						"dID": s_DV[item].sID,
+						"dP": s_DV[item].sP,
+						"nH": s_DV[item].nH,
+						"dis": parseInt(s_DV[item].dis),
+						"nR": s_DV[item].sID,
+						"sP":router_port
+    			}
 				}
 			}
 		}
@@ -79,6 +90,7 @@ function routing(s_DV) {
 
 
 
+
 function findrouters(name) {
 	for (var i in router) {
 		if (i == name) {
@@ -98,6 +110,20 @@ function isEmpty(obj) {
 	return true;
 }
 
+function send() {
+		if (!isEmpty(DV)) {
+			s = JSON.stringify(DV);
+			var copy = new Buffer(s);
+			for (item in DV) {
+				client.send(copy, 0, copy.length, DV[item].dP, '127.0.0.1', function(err, bytes) {
+					if (err) {
+						throw err;
+					}
+					client.close();
+				})
+			}
+		}
+	}
 
 
 io.on('connection', function(socket) { //if a user coonect the server
@@ -165,8 +191,14 @@ io.on('connection', function(socket) { //if a user coonect the server
 
 		io.emit('message', msg);
 	});
-
-
+    socket.on('display',function(msg){
+    	console.log('display');
+    	msg=JSON.stringify(DV);
+    	io.emit('display on',msg);
+    })
+   console.log(temp);
+   console.log('change');
+   console.log(temp1);
 });
 server.on('listening', function() {
 	console.log('udp started');

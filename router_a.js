@@ -1,7 +1,7 @@
 var app = require('express')(); //get express model
 var http = require('http').Server(app); //create a http server
 var io = require('socket.io')(http); //create socket.io
-var route=require('./routing.js')
+var route = require('./routing.js')
 var router_name = 'a'; //to store login router_name
 var router_port = 2547;
 var DV = {};
@@ -18,7 +18,7 @@ app.get('/', function(req, res) { //link the js to html file
 
 });
 
-console.log(route.routing(DV,DV));
+
 
 
 function findrouters(name) {
@@ -30,7 +30,6 @@ function findrouters(name) {
 		}
 	}
 };
-
 
 
 
@@ -90,7 +89,7 @@ io.on('connection', function(socket) { //if a user coonect the server
 			"nH": 1,
 			"dis": msg,
 			"nR": name,
-			"sP":router_port
+			"sP": router_port
 		};
 
 		var msg = name + " " + "is set";
@@ -99,11 +98,11 @@ io.on('connection', function(socket) { //if a user coonect the server
 
 		io.emit('message', msg);
 	});
-    socket.on('display',function(msg){
-    	console.log('display');
-    	msg=JSON.stringify(DV);
-    	io.emit('display on',msg);
-    })
+	socket.on('display', function(msg) {
+		console.log('display');
+		msg = JSON.stringify(DV);
+		io.emit('display on', msg);
+	})
 
 });
 server.on('listening', function() {
@@ -112,25 +111,27 @@ server.on('listening', function() {
 server.on('message', function(message, rinfo) {
 	var s_DV = {};
 	s_DV = JSON.parse(message);
-	
-		route.routing(s_DV);
-		console.log(DV);
-	
+
+	DV = route.routing(DV, s_DV, router_name, router_port);
+	console.log(DV);
+
 })
-setInterval(function () {
-    if (!route.isEmpty(DV)) {
+setInterval(function() {
+	if (!route.isEmpty(DV)) {
 		s = JSON.stringify(DV);
 		var copy = new Buffer(s);
-		for(item in DV){
-			client.send(copy, 0, copy.length, DV[item].dP, '127.0.0.1', function(err, bytes) {
-				if (err) {
-					throw err;
-				}
-				
-			})
+		for (item in DV) {
+			if (DV[item].dID == DV[item].nR) {
+				client.send(copy, 0, copy.length, DV[item].dP, '127.0.0.1', function(err, bytes) {
+					if (err) {
+						throw err;
+					}
+
+				})
+			}
 		}
 	}
-}, 5000);
+}, 10000);
 
 
 

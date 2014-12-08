@@ -5,9 +5,8 @@ var route=require('./routing.js')
 var router_name = 'd'; //to store login router_name
 var router_port = 5834;
 var DV = {};
-
-
-var router = new Array;
+var router={};
+var routers = new Array;
 var name;
 var port;
 var dgram = require('dgram'); // UDP module
@@ -53,7 +52,7 @@ io.on('connection', function(socket) { //if a user coonect the server
 		console.log('chose router');
 		if (!findrouters(msg)) {
 			name = msg;
-			router[msg] = new Array;
+			routers[msg] = new Array;
 
 			var msg = 'Ok, port number?';
 			io.emit('add_port', msg);
@@ -84,7 +83,7 @@ io.on('connection', function(socket) { //if a user coonect the server
 	});
 	socket.on('cost', function(msg) {
 		console.log('add cost');
-		router[name][port] = msg;
+		routers[name][port] = msg;
 
 		DV[name] = {
 			"sID": router_name,
@@ -95,9 +94,25 @@ io.on('connection', function(socket) { //if a user coonect the server
 			"nR": name,
 			"sP": router_port
 		};
-
+         var neighbor={};
+	    neighbor[name]={"port":port,
+	                   "router":router_name,
+	                   "source":router_port,
+	                   "dis":msg};
 		var msg = name + " " + "is set";
-		console.log(router[name][port]);
+		router[name]={"port":port,
+	                   "router":router_name,
+	                    "source":router_port};
+	   
+        var s = JSON.stringify(neighbor);
+        var copy = new Buffer(s);
+        var client1=dgram.createSocket('udp4');
+        client1.send(copy,0,copy.length,port,'127.0.0.1',function(err,bytes){
+        	if(err){
+        		throw err;
+        	}
+        	client1.close();
+        });
 		console.log(DV);
 
 		io.emit('message', msg);
@@ -115,24 +130,36 @@ server.on('listening', function() {
 server.on('message', function(message, rinfo) {
 	var s_DV = {};
 	s_DV = JSON.parse(message);
-
+    if(s_DV[router_name].hasOwnProperty("port")){
+    	console.log('you are my neighbor');
+         router[s_DV[router_name].router]={
+         	"port":s_DV[router_name].source,
+         	"router":router_name,
+         	"source":router_port
+         };
+          if(!route.isEmpty(DV[s_DV[router_name].router])){
+         	DV[s_DV[router_name].router].dis=s_DV[router_name].dis;
+         	DV[s_DV[router_name].router].nH=1;
+         }
+    }
+    else{
 	DV = route.routing(DV, s_DV, router_name, router_port);
 	console.log(DV);
-
+    }
 })
 setInterval(function() {
 	if (!route.isEmpty(DV)) {
 		s = JSON.stringify(DV);
 		var copy = new Buffer(s);
-		for (item in DV) {
-			if (DV[item].dID == DV[item].nR) {
-				client.send(copy, 0, copy.length, DV[item].dP, '127.0.0.1', function(err, bytes) {
+		for (item in router) {
+			
+				client.send(copy, 0, copy.length, router[item].port, '127.0.0.1', function(err, bytes) {
 					if (err) {
 						throw err;
 					}
 
 				})
-			}
+			
 		}
 	}
 }, 10000);

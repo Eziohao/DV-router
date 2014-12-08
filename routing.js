@@ -6,15 +6,17 @@ exports.routing=function (DV,s_DV,router_name,router_port) {
    	 		"sID":router_name,
             "dID":s_DV[item].sID,
             "dP":s_DV[item].sP,
-            "nH":1,
+            "nH":s_DV[item].nH,
             "dis":parseInt(s_DV[item].dis),
             "nR":s_DV[item].sID,
             "sP":router_port
 
    	 	}
    	  }
-   	  if(item!=router_name&&!isEmpty(DV[item])){    //if it's not the router's dv 
-                  
+   	  if(item!=router_name&&!isEmpty(DV[item])&&!isEmpty(DV[s_DV[item].sID])){    //if it's not the router's dv 
+               console.log(item+" "+DV[item].dis);
+               console.log(s_DV[item].sID+":"+""+parseInt(DV[s_DV[item].sID].dis));
+               console.log(item+" "+parseInt(s_DV[item].dis));   
           	if(parseInt(DV[item].dis)>parseInt(DV[s_DV[item].sID].dis)+parseInt(s_DV[item].dis)){
           	       console.log('change your cost');     //if distance larger than 
           		DV[item].dis=parseInt(DV[s_DV[item].sID].dis)+parseInt(s_DV[item].dis);
@@ -54,4 +56,12 @@ function isEmpty(obj) {
 	}
 
 	return true;
+}
+function IsJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
 }

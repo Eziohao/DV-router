@@ -5,7 +5,8 @@ var route = require('./routing.js')
 var router_name = 'a'; //to store login router_name
 var router_port = 2547;
 var DV = {};
-var router={};
+var router={"b":3721,
+            "c":4568};
 var routers=new Array;
 var name;
 var port;
@@ -92,25 +93,7 @@ io.on('connection', function(socket) { //if a user coonect the server
 			"nR": name,
 			"sP": router_port
 		};
-        var neighbor={};
-	    neighbor[name]={"port":port,
-	                   "router":router_name,
-	                   "source":router_port,
-	                   "dis":msg};
-		var msg = name + " " + "is set";
-		 router[name]={"port":port,
-	                   "router":router_name,
-	                    "source":router_port};
-	    
-        var s = JSON.stringify(neighbor);
-        var copy = new Buffer(s);
-        var client1=dgram.createSocket('udp4');
-        client1.send(copy,0,copy.length,port,'127.0.0.1',function(err,bytes){
-        	if(err){
-        		throw err;
-        	}
-        	client1.close();
-        });
+        msg=name+" "+"is set";
         
 		console.log(DV);
 		
@@ -132,22 +115,10 @@ server.on('listening', function() {
 server.on('message', function(message, rinfo) {
 	var s_DV = {};
 	s_DV = JSON.parse(message);
-    if(s_DV[router_name].hasOwnProperty("port")){
-    	console.log('you are my neighbor');
-         router[s_DV[router_name].router]={
-         	"port":s_DV[router_name].source,
-         	"router":router_name,
-         	"source":router_port
-         };
-         if(!route.isEmpty(DV[s_DV[router_name].router])){
-         	DV[s_DV[router_name].router].dis=s_DV[router_name].dis;
-         	DV[s_DV[router_name].router].nH=1;
-         }
-    }
-    else{
+   
 	DV = route.routing(DV, s_DV, router_name, router_port);
 	console.log(DV);
-    }
+    
 })
 setInterval(function() {
 	if (!route.isEmpty(DV)) {
@@ -155,7 +126,7 @@ setInterval(function() {
 		var copy = new Buffer(s);
 		for (item in router) {
 			
-				client.send(copy, 0, copy.length, router[item].port, '127.0.0.1', function(err, bytes) {
+				client.send(copy, 0, copy.length, router[item], '127.0.0.1', function(err, bytes) {
 					if (err) {
 						throw err;
 					} 
